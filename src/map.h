@@ -26,6 +26,7 @@
 #include "colony.h"
 #include "coordinate_conversions.h"
 #include "coordinates.h"
+#include "creature.h"
 #include "enums.h"
 #include "game_constants.h"
 #include "item.h"
@@ -119,11 +120,13 @@ struct visibility_variables {
     bool variables_set = false;
     bool u_sight_impaired = false;
     bool u_is_boomered = false;
+    bool visibility_cache_dirty = true;
     // Cached values for map visibility calculations
     int g_light_level = 0;
     int u_clairvoyance = 0;
     float vision_threshold = 0.0f;
     std::optional<field_type_id> clairvoyance_field;
+    tripoint last_pos;
 };
 
 struct bash_params {
@@ -347,6 +350,12 @@ class map
         void set_outside_cache_dirty( int zlev );
         void set_floor_cache_dirty( int zlev );
         void set_pathfinding_cache_dirty( int zlev );
+        void set_visitable_zones_cache_dirty( bool dirty = true ) {
+            visitable_cache_dirty = dirty;
+        };
+        bool get_visitable_zones_cache_dirty() const {
+            return visitable_cache_dirty;
+        };
         /*@}*/
 
         void invalidate_map_cache( int zlev );
@@ -364,7 +373,7 @@ class map
 
         /**
          * A pre-filter for bresenham LOS.
-         * true, if there might be is a potential bresenham path between two points.
+         * true, if there might be a potential bresenham path between two points.
          * false, if such path definitely not possible.
          */
         bool has_potential_los( const tripoint &from, const tripoint &to,
@@ -583,6 +592,9 @@ class map
         * If there's no obstacle adjacent to the target - no coverage.
         */
         int obstacle_coverage( const tripoint &loc1, const tripoint &loc2 ) const;
+        int ledge_coverage( const Creature &viewer, const tripoint &target_p ) const;
+        int ledge_coverage( const tripoint &viewer_p, const tripoint &target_p,
+                            const float &eye_level = 1.0f ) const;
         /**
         * Returns coverage value of the tile.
         */
@@ -1280,6 +1292,7 @@ class map
          *  Adds an item to map tile or stacks charges
          *  @param pos Where to add item
          *  @param obj Item to add
+         *  @param copies_remaining Number of identical copies of the item to create
          *  @param overflow if destination is full attempt to drop on adjacent tiles
          *  @return reference to dropped (and possibly stacked) item or null item on failure
          *  @warning function is relatively expensive and meant for user initiated actions, not mapgen
@@ -1287,7 +1300,11 @@ class map
         // TODO: fix point types (remove the first overload)
         item_location add_item_ret_loc( const tripoint &pos, item obj, bool overflow = true );
         item &add_item_or_charges( const tripoint &pos, item obj, bool overflow = true );
+        item &add_item_or_charges( const tripoint &pos, item obj, int &copies_remaining,
+                                   bool overflow = true );
         item &add_item_or_charges( const tripoint_bub_ms &pos, item obj, bool overflow = true );
+        item &add_item_or_charges( const tripoint_bub_ms &pos, item obj, int &copies_remaining,
+                                   bool overflow = true );
         item &add_item_or_charges( const point &p, const item &obj, bool overflow = true ) {
             return add_item_or_charges( tripoint( p, abs_sub.z() ), obj, overflow );
         }
@@ -1305,6 +1322,7 @@ class map
          *
          * @returns The item that got added, or nulitem.
          */
+        item &add_item( const tripoint &p, item new_item, int copies );
         item &add_item( const tripoint &p, item new_item );
         void add_item( const point &p, const item &new_item ) {
             add_item( tripoint( p, abs_sub.z() ), new_item );
@@ -1596,7 +1614,7 @@ class map
             Map &m, const tripoint &p, const field_type_id &type );
 
         std::pair<item *, tripoint> _add_item_or_charges( const tripoint &pos, item obj,
-                bool overflow = true );
+                int &copies_remaining, bool overflow = true );
     public:
 
         // Splatters of various kind
@@ -1654,12 +1672,16 @@ class map
         void support_dirty( const tripoint &p );
     public:
 
-        // Returns true if terrain at p has NO flag ter_furn_flag::TFLAG_NO_FLOOR,
+        // Returns true if terrain at p has NO flag ter_furn_flag::TFLAG_NO_FLOOR
+        // and ter_furn_flag::TFLAG_NO_FLOOR_WATER,
         // if we're not in z-levels mode or if we're at lowest level
         bool has_floor( const tripoint &p ) const;
+        bool has_floor_or_water( const tripoint &p ) const;
         /** Does this tile support vehicles and furniture above it */
         bool supports_above( const tripoint &p ) const;
         bool has_floor_or_support( const tripoint &p ) const;
+        bool has_vehicle_floor( const tripoint &p ) const;
+        bool has_vehicle_floor( const tripoint_bub_ms &p ) const;
 
         /**
          * Handles map objects of given type (not creatures) falling down.
@@ -1741,6 +1763,7 @@ class map
          * Returns whether the tile at `p` is transparent(you can look past it).
          */
         bool is_transparent( const tripoint &p ) const;
+        bool is_transparent_wo_fields( const tripoint &p ) const;
         // End of light/transparency
 
         /**
@@ -1927,6 +1950,9 @@ class map
         bool build_floor_cache( int zlev );
         // We want this visible in `game`, because we want it built earlier in the turn than the rest
         void build_floor_caches();
+        void seen_cache_process_ledges( array_of_grids_of<float> &seen_caches,
+                                        const array_of_grids_of<const bool> &floor_caches,
+                                        const std::optional<tripoint> &override_p ) const;
 
     protected:
         void generate_lightmap( int zlev );
@@ -2210,6 +2236,13 @@ class map
         bool _main_requires_cleanup = false;
         std::optional<bool> _main_cleanup_override = std::nullopt;
 
+        // Tracks the dirtiness of the visitable zones cache, but that cache does not live here,
+        // it is distributed among the active monsters. This must be flipped when
+        // persistent visibility from terrain or furniture changes
+        // (this excludes vehicles and fields) or when persistent traversability changes,
+        // which means walls and floors.
+        bool visitable_cache_dirty = false;
+
     public:
         void queue_main_cleanup();
         bool is_main_cleanup_queued() const;
@@ -2223,6 +2256,7 @@ class map
         void update_pathfinding_cache( int zlev ) const;
 
         void update_visibility_cache( int zlev );
+        void invalidate_visibility_cache();
         const visibility_variables &get_visibility_variables_cache() const;
 
         void update_submaps_with_active_items();
@@ -2271,6 +2305,8 @@ class map
 
         bool has_haulable_items( const tripoint &pos );
         std::vector<item_location> get_haulable_items( const tripoint &pos );
+
+        std::map<tripoint, std::pair<lit_level, std::array<bool, 5>>> ll_invis_cache;
 };
 
 map &get_map();

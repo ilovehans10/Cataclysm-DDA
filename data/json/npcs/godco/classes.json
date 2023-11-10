@@ -405,7 +405,6 @@
     "weapon_override": "GODCO_felicity_wield",
     "traits": [
       { "group": "NPC_starting_traits" },
-      { "trait": "STYLISH" },
       { "trait": "SPIRITUAL" },
       { "group": "Appearance_Mixed" },
       { "trait": "NO_BASH" },
@@ -565,6 +564,24 @@
         "level": { "mul": [ { "one_in": 3 }, { "sum": [ { "dice": [ 2, 2 ] }, { "constant": -2 }, { "one_in": 4 } ] } ] }
       }
     ]
+  },
+  {
+    "type": "npc_class",
+    "id": "NC_TRADER_PREDATORY",
+    "name": { "str": "Trader" },
+    "job_description": "I'm collecting gear and selling it at a high interest.",
+    "traits": [ { "group": "BG_survival_story_EVACUEE" }, { "group": "NPC_starting_traits" }, { "group": "Appearance_demographics" } ],
+    "shopkeeper_item_group": [ { "group": "NC_EVAC_SHOPKEEP_misc", "rigid": true } ],
+    "shopkeeper_price_rules": [
+      { "item": "icon", "price": 100 },
+      {
+        "group": "NC_EVAC_SHOPKEEP_misc",
+        "condition": { "not": { "npc_has_var": "u_paidoff", "type": "general", "context": "meeting", "value": "yes" } },
+        "markup": 3
+      }
+    ],
+    "bonus_int": { "one_in": 4 },
+    "bonus_per": { "one_in": 4 }
   },
   {
     "type": "item_group",
@@ -1059,8 +1076,7 @@
       [ "trappers_companion", 2 ],
       [ "textbook_traps", 8 ],
       [ "beartrap", 25 ],
-      [ "bolt_steel", 15 ],
-      [ "bolt_cf", 10 ],
+      { "group": "crossbow_bolts", "prob": 10 },
       [ "hand_crossbow", 1 ],
       [ "crossbow", 2 ],
       [ "compcrossbow", 3 ],

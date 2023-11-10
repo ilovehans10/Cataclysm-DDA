@@ -61,6 +61,7 @@ enum class mod : int {
     SIGHT_RANGE_ELECTRIC,
     MOTION_VISION_RANGE,
     SIGHT_RANGE_NETHER,
+    SIGHT_RANGE_MINDS,
     CARRY_WEIGHT,
     WEAPON_DISPERSION,
     SOCIAL_LIE,
@@ -273,7 +274,6 @@ class enchant_cache : public enchantment
 
         // details of each enchantment that includes them (name and description)
         std::vector<std::pair<std::string, std::string>> details; // NOLINT(cata-serialize)
-
 
     private:
         std::map<enchant_vals::mod, double> values_add; // NOLINT(cata-serialize)

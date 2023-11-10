@@ -777,7 +777,7 @@ int widget::get_var_value( const avatar &ava ) const
         case widget_var::bp_warmth:
             // Body part warmth/temperature
             if( ava.has_part( only_bp(), body_part_filter::equivalent ) ) {
-                value = ava.get_part_temp_cur( only_bp() );
+                value = units::to_legacy_bodypart_temp( ava.get_part_temp_cur( only_bp() ) );
             } else {
                 value = 0;
             }
@@ -1574,7 +1574,7 @@ std::string widget::graph( int value ) const
     // Re-arrange characters to a vertical bar graph
     if( _arrange == "rows" ) {
         std::wstring temp = ret;
-        ret = std::wstring();
+        ret.clear();
         for( int i = temp.size() - 1; i >= 0; i-- ) {
             ret += temp[i];
             if( i > 0 ) {

@@ -372,7 +372,7 @@ void vehicle::build_electronics_menu( veh_menu &menu )
             menu.add( _( "Play arcade machine" ) )
             .hotkey( "ARCADE" )
             .enable( !!arc_itm )
-            .on_submit( [arc_itm] { iuse::portable_game( &get_avatar(), arc_itm, false, tripoint_zero ); } );
+            .on_submit( [arc_itm] { iuse::portable_game( &get_avatar(), arc_itm, tripoint_zero ); } );
             break;
         }
     }
@@ -526,6 +526,15 @@ void vehicle::toggle_autopilot()
         stop_engines();
     } );
 
+    menu.add( precollision_on ? _( "Disable pre-collision system" ) :
+              _( "Enable pre-collision system" ) )
+    .hotkey( "CONTROL_AUTOPILOT_CAS" )
+    .desc( _( "Toggle pre-collision system" ) )
+    .on_submit( [this] {
+        precollision_on = !precollision_on;
+        add_msg( precollision_on ? _( "You turn on pre-collision system." ) : _( "You turn off pre-collision system." ) );
+    } );
+
     menu.query();
 }
 
@@ -560,7 +569,7 @@ void vehicle::plug_in( const tripoint &pos )
     item cord = init_cord( pos );
 
     if( cord.get_use( "link_up" ) ) {
-        cord.type->get_use( "link_up" )->call( &get_player_character(), cord, false, pos );
+        cord.type->get_use( "link_up" )->call( &get_player_character(), cord, pos );
     }
 }
 
@@ -899,9 +908,7 @@ void vehicle::honk_horn() const
 void vehicle::reload_seeds( const tripoint &pos )
 {
     Character &player_character = get_player_character();
-    std::vector<item *> seed_inv = player_character.items_with( []( const item & itm ) {
-        return itm.is_seed();
-    } );
+    std::vector<item *> seed_inv = player_character.cache_get_items_with( "is_seed", &item::is_seed );
 
     auto seed_entries = iexamine::get_seed_entries( seed_inv );
     seed_entries.emplace( seed_entries.begin(), itype_null, _( "No seed" ), 0 );
@@ -961,7 +968,7 @@ void vehicle::play_music() const
 {
     Character &player_character = get_player_character();
     for( const vpart_reference &vp : get_enabled_parts( "STEREO" ) ) {
-        iuse::play_music( player_character, vp.pos(), 15, 30 );
+        iuse::play_music( &player_character, vp.pos(), 15, 30 );
     }
 }
 
@@ -1864,7 +1871,7 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
     bool power_linked = false;
     bool cable_linked = false;
     for( vehicle_part *vp_part : vp_parts ) {
-        power_linked = power_linked ? true : vp_part->info().has_flag( "POWER_TRANSFER" );
+        power_linked = power_linked ? true : vp_part->info().has_flag( VPFLAG_POWER_TRANSFER );
         cable_linked = cable_linked ? true : vp_part->has_flag( vp_flag::linked_flag ) ||
                        vp_part->info().has_flag( "TOW_CABLE" );
     }
@@ -1874,7 +1881,11 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
         .skip_theft_check()
         .skip_locked_check()
         .hotkey( "EXAMINE_VEHICLE" )
-        .on_submit( [this] { g->exam_vehicle( *this ); } );
+        .on_submit( [this, vp] {
+            const vpart_position non_fake( *this, get_non_fake_part( vp.part_index() ) );
+            const point start_pos = non_fake.mount().rotate( 2 );
+            g->exam_vehicle( *this, start_pos );
+        } );
 
         menu.add( tracking_on ? _( "Forget vehicle position" ) : _( "Remember vehicle position" ) )
         .skip_theft_check()
@@ -1981,7 +1992,12 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
             .on_submit( [] { handbrake(); } );
         }
 
-        if( controls_here && engines.size() > 1 ) {
+        const bool has_engine_or_fuel_controls = ( engines.size() > 1 ) ||
+        std::any_of( engines.begin(), engines.end(), [&]( int engine_idx ) {
+            return parts[engine_idx].info().engine_info->fuel_opts.size() > 1;
+        } );
+
+        if( controls_here && has_engine_or_fuel_controls ) {
             menu.add( _( "Control individual engines" ) )
             .hotkey( "CONTROL_ENGINES" )
             .on_submit( [this] { control_engines(); } );
@@ -2088,7 +2104,7 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
         .on_submit( [this, vp_parts] {
             for( vehicle_part *vp_part : vp_parts )
             {
-                if( vp_part->info().has_flag( "POWER_TRANSFER" ) ) {
+                if( vp_part->info().has_flag( VPFLAG_POWER_TRANSFER ) ) {
                     item drop = part_to_item( *vp_part );
                     if( !magic && !drop.has_flag( STATIC( flag_id( "NO_DROP" ) ) ) ) {
                         get_player_character().i_add_or_drop( drop );
@@ -2113,6 +2129,7 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
                 if( vp_part->has_flag( vp_flag::linked_flag ) ) {
                     vp_part->last_disconnected = calendar::turn;
                     vp_part->remove_flag( vp_flag::linked_flag );
+                    linked_item_epower_this_turn = 0_W;
                     add_msg( _( "You detached the %s's cables." ), vp_part->name( false ) );
                 }
                 if( vp_part->info().has_flag( "TOW_CABLE" ) ) {

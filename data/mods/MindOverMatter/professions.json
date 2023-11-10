@@ -30,7 +30,7 @@
     ],
     "items": {
       "both": {
-        "items": [ "jacket_light", "jeans", "socks", "cleats", "sports_drink", "biokin_recipe_note" ],
+        "items": [ "jacket_light", "jeans", "socks", "cleats", "sports_drink" ],
         "entries": [ { "group": "charged_smart_phone" }, { "item": "tshirt", "variant": "generic_tshirt" } ]
       },
       "male": [ "boxer_shorts" ],
@@ -53,19 +53,43 @@
     ],
     "items": {
       "both": {
-        "items": [
-          "jeans",
-          "socks",
-          "robe",
-          "lowtops",
-          "newest_newspaper",
-          "weeks_old_newspaper",
-          "months_old_newspaper",
-          "clair_recipe_note"
-        ],
+        "items": [ "jeans", "socks", "robe", "lowtops", "newest_newspaper", "weeks_old_newspaper", "months_old_newspaper" ],
         "entries": [ { "group": "charged_smart_phone" }, { "item": "tshirt", "variant": "generic_tshirt" } ]
       },
       "male": [ "briefs" ],
+      "female": [ "bra", "panties" ]
+    }
+  },
+  {
+    "type": "profession",
+    "id": "psi_photokinetic_magician",
+    "name": "Magician",
+    "description": "Ever since you were a young kid, you just loved magic.  Growing up you managed to become a professional magician and even performed at a few big shows.  You were practicing a new trick when the Cataclysm hit, when you realized you don't need to practice anymore.  You can just do it, for real.",
+    "points": 4,
+    "skills": [
+      { "level": 2, "name": "cooking" },
+      { "level": 1, "name": "driving" },
+      { "level": 2, "name": "metaphysics" },
+      { "level": 2, "name": "speech" }
+    ],
+    "traits": [ "FAST_REFLEXES", "PHOTOKINETIC", "PHOTO_EYES" ],
+    "spells": [
+      { "id": "photokinetic_snuff_light", "level": 4 },
+      { "id": "photokinetic_light_dodge", "level": 3 },
+      { "id": "photokinetic_light_beam", "level": 4 },
+      { "id": "photokinetic_light_arms", "level": 2 }
+    ],
+    "items": {
+      "both": {
+        "items": [ "socks", "jeans", "sneakers" ],
+        "entries": [
+          { "item": "tshirt", "variant": "generic_tshirt" },
+          { "item": "deck_of_cards" },
+          { "item": "tophat" },
+          { "item": "teddy_bear", "variant": "toy_plush_rabbit" }
+        ]
+      },
+      "male": [ "boxer_shorts" ],
       "female": [ "bra", "panties" ]
     }
   },
@@ -85,7 +109,7 @@
     ],
     "items": {
       "both": {
-        "items": [ "socks", "jeans", "sneakers", "pyrokin_recipe_note" ],
+        "items": [ "socks", "jeans", "sneakers" ],
         "entries": [
           { "item": "tshirt", "variant": "generic_tshirt" },
           { "item": "lighter", "charges": 100 },
@@ -119,7 +143,7 @@
     ],
     "items": {
       "both": {
-        "items": [ "pants_army", "gloves_tactical", "army_top", "boots_combat", "socks", "telekin_recipe_note" ],
+        "items": [ "pants_army", "gloves_tactical", "army_top", "boots_combat", "socks" ],
         "entries": [ { "item": "water_clean", "container-item": "canteen" }, { "item": "knife_combat", "container-item": "sheath" } ]
       },
       "male": [ "boxer_briefs" ],
@@ -142,7 +166,7 @@
     ],
     "items": {
       "both": {
-        "items": [ "pants", "dress_shirt", "socks", "dress_shoes", "telepath_recipe_note" ],
+        "items": [ "pants", "dress_shirt", "socks", "dress_shoes" ],
         "entries": [
           { "item": "water_clean", "container-item": "canteen" },
           { "group": "charged_smart_phone" },
@@ -174,17 +198,7 @@
     ],
     "items": {
       "both": {
-        "items": [
-          "wristwatch",
-          "pants",
-          "dress_shirt",
-          "socks",
-          "dress_shoes",
-          "officer_uniform",
-          "beret",
-          "holster",
-          "teleport_recipe_note"
-        ],
+        "items": [ "wristwatch", "pants", "dress_shirt", "socks", "dress_shoes", "officer_uniform", "beret", "holster" ],
         "entries": [
           { "item": "mom_fusion_pistol", "ammo-item": "mom_fusion_ammo", "charges": 40, "contents-item": [ "mom_fusion_mag" ] },
           { "item": "mom_fusion_mag", "ammo-item": "mom_fusion_ammo", "charges": 40 }
@@ -210,18 +224,7 @@
     ],
     "items": {
       "both": {
-        "items": [
-          "dress_shirt",
-          "pants",
-          "socks",
-          "dress_shoes",
-          "wristwatch",
-          "flyer",
-          "flyer",
-          "flyer",
-          "holy_symbol",
-          "vitakin_recipe_note"
-        ],
+        "items": [ "dress_shirt", "pants", "socks", "dress_shoes", "wristwatch", "flyer", "flyer", "flyer", "holy_symbol" ],
         "entries": [ { "group": "charged_smart_phone" } ]
       },
       "male": [ "briefs" ],

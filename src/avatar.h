@@ -121,6 +121,8 @@ class avatar : public Character
 
         mfaction_id get_monster_faction() const override;
 
+        void witness_thievery( item * ) override {}
+
         std::string get_save_id() const {
             return save_id.empty() ? name : save_id;
         }
@@ -230,7 +232,6 @@ class avatar : public Character
         bool has_seen_snippet( const snippet_id &snippet ) const;
         const std::set<snippet_id> &get_snippets();
 
-
         /**
          * Opens the targeting menu to pull a nearby creature towards the character.
          * @param name Name of the implement used to pull the creature. */
@@ -267,6 +268,9 @@ class avatar : public Character
         bionic *bionic_by_invlet( int ch );
 
         faction *get_faction() const override;
+        bool is_ally( const Character &p ) const override;
+        bool is_obeying( const Character &p ) const override;
+
         // Set in npc::talk_to_you for use in further NPC interactions
         bool dialogue_by_radio = false;
         // Preferred aim mode - ranged.cpp aim mode defaults to this if possible

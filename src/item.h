@@ -173,6 +173,10 @@ template<>
 struct enum_traits<iteminfo::flags> {
     static constexpr bool is_flag_enum = true;
 };
+// Currently used to store the only throwing stats of character dropping this item. Default is -1
+struct dropped_by_character_stats {
+    float throwing;
+};
 
 iteminfo vol_to_info( const std::string &type, const std::string &left,
                       const units::volume &vol, int decimal_places = 2, bool lower_is_better = true );
@@ -221,6 +225,8 @@ class item : public visitable
 
         ~item() override;
 
+        struct dropped_by_character_stats dropped_char_stats = { -1.0f };
+
         /** Return a pointer-like type that's automatically invalidated if this
          * item is destroyed or assigned-to */
         safe_reference<item> get_safe_reference();
@@ -228,9 +234,10 @@ class item : public visitable
         /**
          * Filter converting this instance to another type preserving all other aspects
          * @param new_type the type id to convert to
+         * @param carrier A pointer to the character that's carrying the item, nullptr if none, which is the default.
          * @return same instance to allow method chaining
          */
-        item &convert( const itype_id &new_type );
+        item &convert( const itype_id &new_type, Character *carrier = nullptr );
 
         /**
          * Filter converting this instance to the inactive type
@@ -345,6 +352,7 @@ class item : public visitable
         bool ready_to_revive( map &here, const tripoint &pos ) const;
 
         bool is_money() const;
+        bool is_cash_card() const;
         bool is_software() const;
         bool is_software_storage() const;
 
@@ -365,6 +373,11 @@ class item : public visitable
          * Returns a symbol for indicating the current dirt or fouling level for a gun.
          */
         std::string dirt_symbol() const;
+
+        /**
+         * Returns a symbol for indicating the overheat level for a gun.
+         */
+        std::string overheat_symbol() const;
 
         /**
          * Returns a symbol indicating the current degradation of the item.
@@ -1117,7 +1130,7 @@ class item : public visitable
         /** Time for this item to be fully fermented. */
         time_duration brewing_time() const;
         /** The results of fermenting this item. */
-        const std::vector<itype_id> &brewing_results() const;
+        const std::map<itype_id, int> &brewing_results() const;
 
         /**
          * Detonates the item and adds remains (if any) to drops.
@@ -1229,8 +1242,6 @@ class item : public visitable
         * damage_type.
         */
         bool damage_type_can_damage_items( const damage_type_id &dmg_type ) const;
-
-
 
         /**
          * Resistance against different damage types (@ref damage_type).
@@ -1370,10 +1381,13 @@ class item : public visitable
         std::string damage_indicator() const;
 
         /**
-         * Provides a prefix for the durability state of the item. with ITEM_HEALTH_BAR enabled,
-         * returns a symbol with color tag already applied. Otherwise, returns an adjective.
+         * Provides a prefix for the durability state of the item.
+         * With ITEM_HEALTH set to:
+         *     "bars": returns a symbol with color tag already applied.
+         *     "descriptions": returns an adjective.
+         *     "both": returns a symbol as well as an adjective.
          * if include_intact is true, this provides a string for the corner case of a player
-         * with ITEM_HEALTH_BAR disabled, but we need still a string for some reason.
+         *     with ITEM_HEALTH set to "descriptions", but we need still a string for some reason.
          */
         std::string durability_indicator( bool include_intact = false ) const;
 
@@ -1454,6 +1468,11 @@ class item : public visitable
             void serialize( JsonOut &jsout ) const;
             void deserialize( const JsonObject &data );
         };
+        /**
+         * @brief Returns true if the item is/has a cable that can link up to other things.
+         */
+        bool can_link_up() const;
+
         /**
          * @brief Sets max_length and efficiency of a link, taking cable extensions into account.
          * @brief max_length is set to the sum of all cable lengths.
@@ -1627,10 +1646,16 @@ class item : public visitable
                                    const item_location &parent_it = item_location(),
                                    units::volume remaining_parent_volume = 10000000_ml,
                                    bool allow_nested = true ) const;
-        bool can_contain( const itype &tp ) const;
-        bool can_contain_partial( const item &it ) const;
+        ret_val<void> can_contain( const item &it, int &copies_remaining, bool nested = false,
+                                   bool ignore_rigidity = false,
+                                   bool ignore_pkt_settings = true,
+                                   const item_location &parent_it = item_location(),
+                                   units::volume remaining_parent_volume = 10000000_ml,
+                                   bool allow_nested = true ) const;
+        ret_val<void> can_contain( const itype &tp ) const;
+        ret_val<void> can_contain_partial( const item &it ) const;
         ret_val<void> can_contain_directly( const item &it ) const;
-        bool can_contain_partial_directly( const item &it ) const;
+        ret_val<void> can_contain_partial_directly( const item &it ) const;
         /*@}*/
         std::pair<item_location, item_pocket *> best_pocket( const item &it, item_location &this_loc,
                 const item *avoid = nullptr, bool allow_sealed = false, bool ignore_settings = false,
@@ -1788,8 +1813,8 @@ class item : public visitable
          *
          * For items not counted by charges, this returns vol / this->volume().
          */
-        int charges_per_volume( const units::volume &vol ) const;
-        int charges_per_weight( const units::mass &m ) const;
+        int charges_per_volume( const units::volume &vol, bool suppress_warning = false ) const;
+        int charges_per_weight( const units::mass &m, bool suppress_warning = false ) const;
 
         /**
          * @name Item variables
@@ -2328,7 +2353,6 @@ class item : public visitable
          */
         units::energy energy_remaining( const Character *carrier = nullptr ) const;
 
-
         /**
          * Quantity of ammunition currently loaded in tool, gun or auxiliary gunmod.
          * @param carrier is used for UPS and bionic power for tools
@@ -2717,6 +2741,7 @@ class item : public visitable
         faction_id get_owner() const;
         faction_id get_old_owner() const;
         bool is_owned_by( const Character &c, bool available_to_take = false ) const;
+        bool is_owned_by( const monster &m, bool available_to_take = false ) const;
         bool is_old_owner( const Character &c, bool available_to_take = false ) const;
         std::string get_old_owner_name() const;
         std::string get_owner_name() const;
@@ -2852,6 +2877,7 @@ class item : public visitable
         item &only_item();
         const item &only_item() const;
         item *get_item_with( const std::function<bool( const item & )> &filter );
+        const item *get_item_with( const std::function<bool( const item & )> &filter ) const;
 
         /**
          * returns the number of items stacks in contents
@@ -2945,6 +2971,7 @@ class item : public visitable
         bool process_link( map &here, Character *carrier, const tripoint &pos );
         bool process_linked_item( Character *carrier, const tripoint &pos, link_state required_state );
         bool process_blackpowder_fouling( Character *carrier );
+        bool process_gun_cooling( Character *carrier );
         bool process_tool( Character *carrier, const tripoint &pos );
 
     public:

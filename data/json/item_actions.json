@@ -37,6 +37,11 @@
   },
   {
     "type": "item_action",
+    "id": "deploy_appliance",
+    "name": { "str": "Deploy item" }
+  },
+  {
+    "type": "item_action",
     "id": "CROWBAR_WEAK",
     "name": { "str": "Pry crate or nails" }
   },
@@ -441,7 +446,7 @@
   {
     "type": "item_action",
     "id": "EBOOKSAVE",
-    "name": { "str": "Store a book" }
+    "name": { "str": "Store books" }
   },
   {
     "type": "item_action",
@@ -640,7 +645,7 @@
   },
   {
     "type": "item_action",
-    "id": "MP3_ON",
+    "id": "MP3_DEACTIVATE",
     "name": { "str": "Turn off music" }
   },
   {
@@ -650,12 +655,12 @@
   },
   {
     "type": "item_action",
-    "id": "GASMASK",
+    "id": "GASMASK_ACTIVATE",
     "name": { "str": "Prepare to use" }
   },
   {
     "type": "item_action",
-    "id": "DIVE_TANK",
+    "id": "DIVE_TANK_ACTIVATE",
     "name": { "str": "Use regulator" }
   },
   {
@@ -677,11 +682,6 @@
     "type": "item_action",
     "id": "MYCUS",
     "name": { "str": "Consume" }
-  },
-  {
-    "type": "item_action",
-    "id": "NOISE_EMITTER_OFF",
-    "name": { "str": "Turn on" }
   },
   {
     "type": "item_action",

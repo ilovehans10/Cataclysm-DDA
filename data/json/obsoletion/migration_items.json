@@ -40,6 +40,21 @@
     "replace": "scar_l"
   },
   {
+    "id": "ammunition_box_223",
+    "type": "MIGRATION",
+    "replace": "ammo_box_army_10_338"
+  },
+  {
+    "id": "ammunition_box_308",
+    "type": "MIGRATION",
+    "replace": "ammo_box_2"
+  },
+  {
+    "id": "ammunition_box_50bmg",
+    "type": "MIGRATION",
+    "replace": "ammo_box_4"
+  },
+  {
     "id": "r_paint",
     "type": "MIGRATION",
     "replace": "paint_can_steel",
@@ -211,5 +226,28 @@
     "type": "MIGRATION",
     "replace": "bodypillow",
     "variant": "bodypillow_makeshift"
+  },
+  {
+    "id": "sword_sheets_bolted",
+    "type": "MIGRATION",
+    "replace": "sword_sheets_welded",
+    "variant": "sword_sheets_bolted"
+  },
+  {
+    "id": "sword_sheets_bolted_large",
+    "type": "MIGRATION",
+    "replace": "sword_sheets_welded_large",
+    "variant": "sword_sheets_bolted_large"
+  },
+  {
+    "id": "burdock_stalk",
+    "type": "MIGRATION",
+    "replace": "plant_stalk"
+  },
+  {
+    "id": "beverage_bag",
+    "type": "MIGRATION",
+    "replace": "bag_zipper",
+    "sealed": false
   }
 ]

@@ -1,31 +1,5 @@
 [
   {
-    "id": "basement_op_guns",
-    "type": "item_group",
-    "//": "Hardcoded gunsafe itemgroup for basement_junk in mapgen_functions.cpp .",
-    "magazine": 100,
-    "subtype": "distribution",
-    "entries": [
-      {
-        "distribution": [
-          {
-            "collection": [
-              { "item": "usp_9mm" },
-              { "item": "usp9mag" },
-              { "item": "9mmP", "charges-min": 30, "charges-max": 50 },
-              { "item": "suppressor" },
-              { "item": "small_repairkit" },
-              { "item": "briefcase" },
-              { "item": "cash_card", "charges-min": 50000, "charges-max": 250000 }
-            ],
-            "prob": 50
-          },
-          { "group": "guns_survival", "prob": 50 }
-        ]
-      }
-    ]
-  },
-  {
     "type": "item_group",
     "subtype": "distribution",
     "id": "smokelounge_items",
@@ -149,7 +123,13 @@
       { "group": "surgery", "prob": 80 },
       { "group": "drugs_emergency", "prob": 40 },
       { "group": "softdrugs", "prob": 20 },
-      { "group": "harddrugs", "prob": 5 }
+      { "group": "harddrugs", "prob": 5 },
+      { "item": "left_leg_prosthetic", "prob": 5 },
+      { "item": "right_leg_prosthetic", "prob": 5 },
+      { "item": "right_arm_prosthetic", "prob": 5 },
+      { "item": "right_arm_prosthetic", "prob": 5 },
+      { "item": "right_arm_neuroprosthetic", "prob": 2 },
+      { "item": "right_arm_neuroprosthetic", "prob": 2 }
     ]
   },
   {
@@ -181,6 +161,7 @@
       { "item": "bandages", "prob": 30, "count": [ 1, 3 ] },
       { "group": "adhesive_bandages_box_used", "prob": 30 },
       { "group": "cotton_ball_bag_used", "prob": 50 },
+      { "group": "cotton_ball_bag_full", "prob": 20 },
       [ "syringe", 8 ],
       [ "adrenaline_injector", 5 ],
       [ "canister_empty", 5 ],
@@ -203,7 +184,7 @@
       [ "oxy_powder", 2 ],
       [ "hazmat_suit", 5 ],
       [ "fungicide", 10 ],
-      [ "insecticide", 5 ],
+      { "group": "insecticide_bag_plastic", "prob": 5 },
       { "item": "oxygen_tank", "prob": 40, "charges": [ 0, 24 ] },
       [ "autoclave", 20 ],
       { "item": "smoxygen_tank", "prob": 10, "charges": [ 0, 12 ] },
@@ -218,6 +199,12 @@
       [ "strong_antibiotic", 1 ],
       [ "antibiotics", 5 ],
       [ "weak_antibiotic", 15 ],
+      { "item": "left_leg_prosthetic", "prob": 5 },
+      { "item": "right_leg_prosthetic", "prob": 5 },
+      { "item": "left_arm_prosthetic", "prob": 5 },
+      { "item": "right_arm_prosthetic", "prob": 5 },
+      { "item": "left_arm_neuroprosthetic", "prob": 2 },
+      { "item": "right_arm_neuroprosthetic", "prob": 2 },
       [ "crutches", 5 ]
     ]
   },
@@ -264,8 +251,11 @@
       [ "recipe_medicalmut", 1 ],
       [ "survnote", 1 ],
       [ "badge_doctor", 1 ],
+      [ "lanyard", 1 ],
       [ "tourist_table", 1 ],
       [ "thermos", 10 ],
+      [ "left_leg_prosthetic", 40 ],
+      [ "right_leg_prosthetic", 40 ],
       [ "crutches", 5 ]
     ]
   },
@@ -307,6 +297,7 @@
       { "item": "liq_bandage_spray", "prob": 5, "charges-min": 1 },
       { "group": "adhesive_bandages_box_used", "prob": 15 },
       { "item": "duct_tape", "prob": 20, "charges": [ 50, 200 ] },
+      { "item": "superglue", "prob": 10 },
       { "item": "sewing_kit", "prob": 10, "charges-min": 0 },
       { "item": "mouthpiece", "prob": 10 },
       { "item": "cigar", "prob": 20, "count": [ 1, 5 ] },
@@ -582,27 +573,6 @@
     "items": [ [ "ash", 100 ] ]
   },
   {
-    "id": "library_elec",
-    "type": "item_group",
-    "items": [
-      [ "superglue", 30 ],
-      [ "processor", 15 ],
-      [ "RAM", 22 ],
-      [ "power_supply", 16 ],
-      [ "amplifier", 8 ],
-      [ "transponder", 5 ],
-      [ "receiver", 10 ],
-      [ "antenna", 18 ],
-      [ "screwdriver", 40 ],
-      { "group": "ammo_pocket_batteries_full", "prob": 50 },
-      [ "manual_electronics", 20 ],
-      [ "memory_card_unread", 20 ],
-      [ "usb_drive", 5 ],
-      [ "software_useless", 10 ],
-      [ "survnote", 1 ]
-    ]
-  },
-  {
     "id": "fishing_items",
     "type": "item_group",
     "//": "For fishing themed locations, excludes makeshift items",
@@ -848,7 +818,6 @@
     "id": "recycle_iron",
     "type": "item_group",
     "items": [
-      { "item": "bolt_metal", "prob": 15, "charges-min": 1, "charges-max": 3 },
       { "item": "oil_lamp", "prob": 20, "charges-min": 0, "charges-max": 3 },
       [ "steam_triple_small", 1 ],
       [ "steam_triple_medium", 1 ],
@@ -1099,7 +1068,11 @@
       { "item": "bone_fossil", "prob": 20, "damage": [ 2, 4 ] },
       { "item": "large_bone_fossil", "prob": 20, "damage": [ 2, 4 ] },
       { "item": "bone_plaster", "prob": 50, "damage": [ 2, 4 ] },
-      { "item": "large_bone_plaster", "prob": 50, "damage": [ 2, 4 ] }
+      { "item": "large_bone_plaster", "prob": 50, "damage": [ 2, 4 ] },
+      { "item": "left_peg_leg", "prob": 10, "damage": [ 2, 4 ] },
+      { "item": "right_peg_leg", "prob": 10, "damage": [ 2, 4 ] },
+      { "item": "left_arm_prosthetic_wood", "prob": 10, "damage": [ 2, 4 ] },
+      { "item": "right_arm_prosthetic_wood", "prob": 10, "damage": [ 2, 4 ] }
     ]
   },
   {
@@ -1203,7 +1176,15 @@
       { "item": "ceramic_cup", "prob": 90, "damage": [ 2, 4 ] },
       { "group": "tinware", "prob": 50, "damage": [ 2, 4 ] },
       { "item": "crown_golden", "prob": 10, "damage": [ 2, 4 ] },
-      { "item": "fluid_preserved_brain", "prob": 20 }
+      { "item": "fluid_preserved_brain", "prob": 20 },
+      { "item": "left_peg_leg", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "right_peg_leg", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "right_leg_prosthetic_steel", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "left_leg_prosthetic_steel", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "left_arm_prosthetic_wood", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "right_arm_prosthetic_wood", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "left_arm_prosthetic_steel", "prob": 15, "damage": [ 2, 4 ] },
+      { "item": "right_arm_prosthetic_steel", "prob": 15, "damage": [ 2, 4 ] }
     ]
   },
   {
@@ -1225,6 +1206,7 @@
       { "item": "bandages", "prob": 25, "count": [ 1, 3 ] },
       { "group": "adhesive_bandages_box_used", "prob": 25 },
       { "group": "cotton_ball_bag_used", "prob": 50 },
+      { "group": "cotton_ball_bag_full", "prob": 20 },
       [ "pan", 60 ],
       { "prob": 10, "group": "coke_bag_zipper_1_8" },
       { "prob": 90, "group": "meth_bag_zipper_1_6" },
@@ -1297,23 +1279,6 @@
       [ "chem_aluminium_sulphate", 20 ],
       [ "plunger_toilet", 10 ],
       [ "plunger_futuristic", 5 ]
-    ]
-  },
-  {
-    "type": "item_group",
-    "id": "mine_storage",
-    "items": [
-      [ "shovel", 10 ],
-      [ "pickaxe", 2 ],
-      [ "bucket", 20 ],
-      [ "rock", 40 ],
-      [ "rock_large", 10 ],
-      { "group": "tools_toolbox", "prob": 5 },
-      [ "coal_lump", 20 ],
-      [ "material_shrd_limestone", 40 ],
-      [ "material_niter", 5 ],
-      [ "chem_rdx", 5 ],
-      [ "chem_hmtd", 10 ]
     ]
   },
   {
@@ -1436,11 +1401,6 @@
   },
   {
     "type": "item_group",
-    "id": "hive_center",
-    "items": [ [ "honeycomb", 10 ], [ "royal_jelly", 8 ] ]
-  },
-  {
-    "type": "item_group",
     "id": "road",
     "items": [
       { "group": "ammo_casings", "prob": 20 },
@@ -1518,7 +1478,6 @@
     "items": [
       [ "tonfa", 50 ],
       [ "tonfa_wood", 10 ],
-      [ "blackjack", 50 ],
       { "item": "shocktonfa_off", "prob": 25, "charges": [ 0, 500 ] },
       { "item": "tazer", "prob": 25, "charges": [ 0, 500 ] },
       { "item": "remington_700", "prob": 5, "charges": [ 0, 4 ] },
@@ -1589,11 +1548,6 @@
       { "item": "sf_watch", "prob": 5 },
       { "item": "platinum_watch", "prob": 1 },
       { "item": "file", "prob": 5 },
-      { "item": "RPG", "prob": 1 },
-      { "item": "RPG-7_ammo", "prob": 1 },
-      { "item": "RPG-7_og7v", "prob": 2 },
-      { "item": "RPG-7_tbg7v", "prob": 1 },
-      { "item": "RPG-7_pg7vr", "prob": 1 },
       { "item": "clown_suit", "prob": 2 },
       { "item": "clownshoes", "prob": 2 },
       { "item": "bondage_suit", "prob": 1 },
@@ -1716,7 +1670,7 @@
       { "item": "knuckle_steel_forged", "prob": 3 },
       { "item": "switchblade", "prob": 4 },
       { "item": "throwing_knife", "prob": 5 },
-      { "item": "throwing_knife", "charges-min": 1, "charges-max": 6, "container-item": "leg_sheath6", "prob": 1 },
+      { "item": "throwing_knife", "count-min": 1, "count-max": 6, "entry-wrapper": "leg_sheath6", "prob": 1 },
       { "item": "leg_sheath6", "prob": 2 },
       { "item": "knife_combat", "container-item": "gartersheath1", "prob": 1 },
       { "item": "gartersheath1", "prob": 10 },
@@ -1749,7 +1703,13 @@
       { "group": "tools_medical", "prob": 100 },
       { "group": "drugs_emergency", "prob": 50 },
       { "prob": 10, "group": "quikclot_bag_plastic_1_6" },
-      { "item": "badge_doctor", "prob": 2 }
+      { "item": "badge_doctor", "prob": 2 },
+      { "item": "left_leg_prosthetic", "prob": 2 },
+      { "item": "right_leg_prosthetic", "prob": 2 },
+      { "item": "left_arm_prosthetic", "prob": 2 },
+      { "item": "right_arm_prosthetic", "prob": 2 },
+      { "item": "left_arm_neuroprosthetic", "prob": 1 },
+      { "item": "right_arm_neuroprosthetic", "prob": 1 }
     ]
   },
   {
@@ -1809,6 +1769,8 @@
       { "item": "bead_bracelet", "prob": 3 },
       { "item": "bead_necklace", "prob": 3 },
       { "item": "cassock", "prob": 40 },
+      { "item": "nun_habit", "prob": 35 },
+      { "item": "nun_wimple", "prob": 35 },
       { "item": "thawb", "prob": 10 },
       { "item": "kufi", "prob": 10 },
       { "item": "icon", "prob": 20 }
@@ -2048,6 +2010,7 @@
       [ "barometer", 3 ],
       [ "sextant", 2 ],
       [ "badge_doctor", 5 ],
+      [ "lanyard", 5 ],
       [ "dnd_handbook", 2 ],
       [ "bodypillow", 1 ],
       { "group": "writing_utensils", "prob": 10 }
@@ -2064,7 +2027,6 @@
       { "group": "ammo_pocket_batteries_full", "prob": 50 },
       [ "file", 20 ],
       [ "howto_computer", 20 ],
-      [ "glassblowing_book", 4 ],
       [ "manual_fabrication", 30 ],
       [ "usb_drive", 5 ],
       { "group": "book_mag_tech", "prob": 70 },
@@ -2125,6 +2087,7 @@
       [ "roller_blades", 20 ],
       [ "rollerskates", 20 ],
       [ "roller_shoes_off", 20 ],
+      [ "folded_skateboard_generic", 20 ],
       [ "survnote", 3 ],
       { "group": "toy_radio_car", "prob": 3 },
       { "group": "toy_makerspace_kit", "prob": 1 },
@@ -2492,6 +2455,7 @@
       { "group": "adhesive_bandages_box_used", "prob": 50 },
       { "item": "liq_bandage_spray", "prob": 10, "charges-min": 1 },
       { "group": "cotton_ball_bag_used", "prob": 50 },
+      { "group": "cotton_ball_bag_full", "prob": 40 },
       { "group": "used_1st_aid", "prob": 35 },
       { "distribution": [ { "group": "full_ifak" }, { "group": "used_ifak" } ], "prob": 35 },
       { "distribution": [ { "group": "full_survival_kit" }, { "group": "used_survival_kit" } ], "prob": 35 },
@@ -2505,6 +2469,8 @@
       { "item": "dayquil", "prob": 70, "charges": [ 1, 5 ] },
       [ "screwdriver", 40 ],
       [ "screwdriver_set", 10 ],
+      { "item": "duct_tape", "prob": 10, "charges": [ 25, 400 ] },
+      { "item": "superglue", "prob": 5 },
       [ "boots", 70 ],
       [ "boots_winter", 60 ],
       [ "boots_hiking", 30 ],
@@ -2711,7 +2677,16 @@
     "id": "mil_base_bed_hospital",
     "type": "item_group",
     "subtype": "distribution",
-    "entries": [ { "item": "blanket", "prob": 50 }, { "item": "cotton_patchwork", "prob": 100, "custom-flags": [ "FILTHY" ] } ]
+    "entries": [
+      { "item": "blanket", "prob": 50 },
+      { "item": "cotton_patchwork", "prob": 100, "custom-flags": [ "FILTHY" ] },
+      { "item": "left_leg_prosthetic", "prob": 20 },
+      { "item": "right_leg_prosthetic", "prob": 20 },
+      { "item": "left_arm_prosthetic", "prob": 20 },
+      { "item": "right_arm_prosthetic", "prob": 20 },
+      { "item": "left_arm_neuroprosthetic", "prob": 10 },
+      { "item": "right_arm_neuroprosthetic", "prob": 10 }
+    ]
   },
   {
     "id": "mil_base_table_hospital",

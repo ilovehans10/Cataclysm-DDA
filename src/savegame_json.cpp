@@ -475,8 +475,7 @@ void SkillLevel::deserialize( const JsonObject &data )
     data.read( "istraining", _isTraining );
     data.read( "rustaccumulator", _rustAccumulator );
     if( !data.read( "lastpracticed", _lastPracticed ) ) {
-        _lastPracticed = calendar::start_of_cataclysm + time_duration::from_hours(
-                             get_option<int>( "INITIAL_TIME" ) );
+        _lastPracticed = calendar::start_of_game;
     }
     data.read( "knowledgeLevel", _knowledgeLevel );
     if( _knowledgeLevel < _level ) {
@@ -844,7 +843,7 @@ void Character::load( const JsonObject &data )
     update_bionic_power_capacity();
     data.read( "death_eocs", death_eocs );
     worn.on_takeoff( *this );
-    worn.clear();
+    clear_worn();
     // deprecate after 0.G
     if( data.has_array( "worn" ) ) {
         std::list<item> items;
@@ -934,7 +933,7 @@ void Character::load( const JsonObject &data )
     if( data.has_array( "temp_cur" ) ) {
         set_anatomy( anatomy_human_anatomy );
         set_body();
-        std::array<int, 12> temp_cur;
+        std::array<units::temperature, 12> temp_cur;
         temp_cur.fill( BODYTEMP_NORM );
         data.read( "temp_cur", temp_cur );
         set_part_temp_cur( bodypart_id( "torso" ), temp_cur[0] );
@@ -953,7 +952,7 @@ void Character::load( const JsonObject &data )
     if( data.has_array( "temp_conv" ) ) {
         set_anatomy( anatomy_human_anatomy );
         set_body();
-        std::array<int, 12> temp_conv;
+        std::array<units::temperature, 12> temp_conv;
         temp_conv.fill( BODYTEMP_NORM );
         data.read( "temp_conv", temp_conv );
         set_part_temp_conv( bodypart_id( "torso" ), temp_conv[0] );
@@ -1490,8 +1489,7 @@ void Character::store( JsonOut &json ) const
     json.end_array();
 
     //save queued effect_on_conditions
-    std::priority_queue<queued_eoc, std::vector<queued_eoc>, eoc_compare> temp_queued(
-        queued_effect_on_conditions );
+    queued_eocs temp_queued( queued_effect_on_conditions );
     json.member( "queued_effect_on_conditions" );
     json.start_array();
     while( !temp_queued.empty() ) {
@@ -3224,7 +3222,7 @@ void item::deserialize( const JsonObject &data )
 
         contents.read_mods( read_contents );
         update_modified_pockets();
-        contents.combine( read_contents, false, true, false );
+        contents.combine( read_contents, false, true, false, true );
 
         if( data.has_object( "contents" ) ) {
             JsonObject tested = data.get_object( "contents" );
@@ -3352,6 +3350,7 @@ void vehicle_part::deserialize( const JsonObject &data )
     data.read( "crew_id", crew_id );
     data.read( "items", items );
     data.read( "tools", tools );
+    data.read( "salvageable", salvageable );
     data.read( "target_first_x", target.first.x );
     data.read( "target_first_y", target.first.y );
     data.read( "target_first_z", target.first.z );
@@ -3401,6 +3400,7 @@ void vehicle_part::serialize( JsonOut &json ) const
     }
     json.member( "items", items );
     json.member( "tools", tools );
+    json.member( "salvageable", salvageable );
     if( target.first != tripoint_min ) {
         json.member( "target_first_x", target.first.x );
         json.member( "target_first_y", target.first.y );
@@ -3509,6 +3509,7 @@ void vehicle::deserialize( const JsonObject &data )
     data.read( "is_alarm_on", is_alarm_on );
     data.read( "camera_on", camera_on );
     data.read( "autopilot_on", autopilot_on );
+    data.read( "precollision_on", precollision_on );
     data.read( "last_update_turn", last_update );
 
     units::angle fdir_angle = units::from_degrees( fdir );
@@ -3647,6 +3648,7 @@ void vehicle::serialize( JsonOut &json ) const
     json.member( "is_alarm_on", is_alarm_on );
     json.member( "camera_on", camera_on );
     json.member( "autopilot_on", autopilot_on );
+    json.member( "precollision_on", precollision_on );
     json.member( "last_update_turn", last_update );
     json.member( "pivot", pivot_anchor[0] );
     json.member( "is_on_ramp", is_on_ramp );

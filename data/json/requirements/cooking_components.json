@@ -92,6 +92,27 @@
     ]
   },
   {
+    "id": "eggs_frog",
+    "type": "requirement",
+    "//": "All of the different frog eggs",
+    "components": [
+      [
+        [ "egg_leo_frog", 1 ],
+        [ "egg_pattern_frog", 1 ],
+        [ "egg_bullfrog_frog", 1 ],
+        [ "egg_strange_frog", 1 ],
+        [ "egg_fowler_toad", 1 ],
+        [ "egg_foul_toad", 1 ],
+        [ "egg_freedom_toad", 1 ],
+        [ "egg_odd_toad", 1 ],
+        [ "egg_peeper_frog", 1 ],
+        [ "egg_vocal_frog", 1 ],
+        [ "egg_gray_frog", 1 ],
+        [ "egg_shift_frog", 1 ]
+      ]
+    ]
+  },
+  {
     "id": "eggs_invert",
     "type": "requirement",
     "//": "All of the different invertebrate eggs",
@@ -1105,7 +1126,7 @@
         [ "carrot", 2 ],
         [ "irradiated_carrot", 2 ],
         [ "cattail_stalk", 1 ],
-        [ "burdock_stalk", 1 ],
+        [ "plant_stalk", 1 ],
         [ "celery", 1 ],
         [ "irradiated_celery", 1 ],
         [ "corn_kernels", 1 ],

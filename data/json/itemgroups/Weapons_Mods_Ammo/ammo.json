@@ -238,13 +238,6 @@
   },
   {
     "type": "item_group",
-    "id": "ammo_smg_reloaded",
-    "//": "Reloaded SMG ammo balanced according to rarity.",
-    "subtype": "distribution",
-    "entries": [ { "group": "ammo_pistol_reloaded", "prob": 100 } ]
-  },
-  {
-    "type": "item_group",
     "id": "ammo_rifle_common",
     "//": "Rifle ammo commonly owned by citizens and found in many locations.",
     "subtype": "distribution",
@@ -311,7 +304,9 @@
       { "item": "556_m855a1", "prob": 1 },
       { "item": "556_mk262", "prob": 1 },
       { "item": "556_mk318", "prob": 1 },
+      { "item": "556_m995", "prob": 1 },
       { "item": "762_51", "prob": 50 },
+      { "item": "762_51_m993", "prob": 1 },
       { "item": "4570_sp", "prob": 40 },
       { "item": "4570_pen", "prob": 20 },
       { "item": "4570_low", "prob": 40 },
@@ -399,8 +394,10 @@
       { "item": "556_mk318", "prob": 1 },
       { "item": "556", "prob": 79 },
       { "item": "556_m855a1", "prob": 2 },
+      { "item": "556_m995", "prob": 2 },
       { "item": "762_51_incendiary", "prob": 10 },
       { "item": "762_51", "prob": 40 },
+      { "item": "762_51_m993", "prob": 20 },
       { "item": "8mm_caseless", "prob": 30 },
       { "item": "8mm_fmj", "prob": 30 },
       { "item": "8mm_hvp", "prob": 10 },
@@ -827,17 +824,6 @@
       [ "762R_casing", 10 ],
       [ "32_casing", 70 ],
       [ "30carbine_casing", 40 ]
-    ]
-  },
-  {
-    "id": "ammo_casings_bulk",
-    "type": "item_group",
-    "subtype": "distribution",
-    "entries": [
-      { "group": "ammo_casings", "prob": 25, "charges-min": 50, "charges-max": 50 },
-      { "group": "ammo_casings", "prob": 10, "charges-min": 100, "charges-max": 100 },
-      { "group": "ammo_casings", "prob": 2, "charges-min": 250, "charges-max": 250 },
-      { "group": "ammo_casings", "prob": 1, "charges-min": 500, "charges-max": 500 }
     ]
   },
   {

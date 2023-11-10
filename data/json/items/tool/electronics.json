@@ -131,6 +131,7 @@
     "max_charges": 3000,
     "turns_per_charge": 1,
     "use_action": [ "EHANDCUFFS" ],
+    "tick_action": [ "EHANDCUFFS_TICK" ],
     "//": "Don't add ELECTRONIC flag here, since these handcuffs have their own behavior when affected by EMP blast",
     "flags": [ "ALWAYS_TWOHAND", "TRADER_AVOID", "WATER_BREAK" ],
     "melee_damage": { "cut": 1 }
@@ -205,6 +206,7 @@
       },
       { "type": "link_up", "cable_length": 4, "charge_rate": "10 W" }
     ],
+    "tick_action": [ "EPIC_MUSIC" ],
     "//": "LIGHT_10 is the bare minimum for reading without penalties",
     "flags": [ "LIGHT_10", "TRADER_AVOID", "WATCH", "WATER_BREAK", "ELECTRONIC" ]
   },
@@ -269,7 +271,13 @@
     "description": "A tool for measuring radiation.  It is in continuous scan mode, and will produce quiet clicking sounds in the presence of ambient radiation.  Using it allows you to turn it off, or scan yourself or the ground.",
     "power_draw": "200 mW",
     "revert_to": "geiger_off",
-    "use_action": [ "GEIGER" ],
+    "use_action": {
+      "target": "geiger_off",
+      "msg": "The geiger counter's SCANNING LED turns off.",
+      "menu_text": "Turn off",
+      "type": "transform"
+    },
+    "tick_action": [ "GEIGER_ACTIVE" ],
     "flags": [ "TRADER_AVOID", "WATER_BREAK" ]
   },
   {
@@ -366,7 +374,7 @@
       },
       { "type": "link_up", "cable_length": 5, "charge_rate": "140 W" }
     ],
-    "flags": [ "WATCH", "WATER_BREAK", "ELECTRONIC" ],
+    "flags": [ "WATCH", "WATER_BREAK", "ELECTRONIC", "ALLOWS_REMOTE_USE" ],
     "pocket_data": [
       {
         "pocket_type": "MAGAZINE_WELL",
@@ -412,7 +420,8 @@
       },
       { "type": "link_up", "cable_length": 5, "charge_rate": "140 W" }
     ],
-    "flags": [ "WATCH", "LIGHT_10", "TRADER_AVOID", "WATER_BREAK", "ELECTRONIC" ]
+    "tick_action": [ "EPIC_MUSIC" ],
+    "flags": [ "WATCH", "LIGHT_10", "TRADER_AVOID", "WATER_BREAK", "ELECTRONIC", "ALLOWS_REMOTE_USE" ]
   },
   {
     "id": "mp3",
@@ -448,7 +457,8 @@
     "description": "This mp3 player is turned on and playing some great tunes, raising your morale steadily while on your person.  It runs through batteries quickly; you can turn it off by using it.  It also obscures your hearing.",
     "power_draw": "1 W",
     "revert_to": "mp3",
-    "use_action": [ "MP3_ON", { "type": "link_up", "cable_length": 4, "charge_rate": "5 W" } ],
+    "tick_action": [ "MP3_ON" ],
+    "use_action": [ "MP3_DEACTIVATE", { "type": "link_up", "cable_length": 4, "charge_rate": "5 W" } ],
     "flags": [ "TRADER_AVOID", "WATER_BREAK", "ELECTRONIC" ]
   },
   {
@@ -466,7 +476,13 @@
     "color": "yellow",
     "ammo": [ "battery" ],
     "charges_per_use": 1,
-    "use_action": [ "NOISE_EMITTER_OFF" ],
+    "use_action": {
+      "target": "noise_emitter_on",
+      "msg": "You turn the noise emitter on.",
+      "menu_text": "Turn off",
+      "active": true,
+      "type": "transform"
+    },
     "flags": [ "RADIO_MODABLE", "RADIO_INVOKE_PROC", "WATER_BREAK" ],
     "pocket_data": [
       {
@@ -486,7 +502,14 @@
     "description": "A homemade device that is emitting horrible crackles, pops, and other loud static sounds.  Quick, get away from it before it draws zombies to you!",
     "power_draw": "10 W",
     "revert_to": "noise_emitter",
-    "use_action": [ "NOISE_EMITTER_ON" ],
+    "use_action": {
+      "target": "noise_emitter",
+      "msg": "The infernal racket dies as the noise emitter turns off.",
+      "menu_text": "Turn off",
+      "active": false,
+      "type": "transform"
+    },
+    "tick_action": [ "NOISE_EMITTER_ON" ],
     "flags": [ "RADIO_MODABLE", "RADIO_INVOKE_PROC", "TRADER_AVOID", "WATER_BREAK" ]
   },
   {
@@ -581,6 +604,7 @@
     "description": "A popular, fancy smartphone.  Capable of taking photos with its integrated camera and illuminating an area with its flashlight app, assuming it has enough charge.  The smartphone also has a clock app that includes an alarm and an app for tracking consumed calories.  Runs on a small, rechargeable power cell compatible with a Unified Power Supply.",
     "weight": "200 g",
     "volume": "100 ml",
+    "longest_side": "15 cm",
     "price": 20000,
     "price_postapoc": 200,
     "material": [ { "type": "aluminum", "portion": 75 }, { "type": "plastic", "portion": 25 } ],
@@ -637,13 +661,14 @@
     "power_draw": "300 mW",
     "revert_to": "smart_phone",
     "use_action": [
-      "MP3_ON",
+      "MP3_DEACTIVATE",
       "PORTABLE_GAME",
       "EINKTABLETPC",
       "EBOOKSAVE",
       "EBOOKREAD",
       { "type": "link_up", "cable_length": 3, "charge_rate": "20 W" }
     ],
+    "tick_action": [ "MP3_ON" ],
     "extend": { "flags": [ "TRADER_AVOID" ] }
   },
   {
@@ -705,6 +730,7 @@
     "type": "TOOL",
     "name": { "str": "UPS (on)", "str_pl": "UPSes (on)" },
     "description": "A unified power supply, or UPS.  It is a device developed jointly by military and scientific interests for use in combat and the field.  The UPS is designed to power bionics, armor, and some guns, but drains batteries quickly.",
+    "//": "Intended as an inverter that attaches to a battery, therefore it's volume will expand based on the size of battery attached.",
     "weight": "680 g",
     "volume": "2500 ml",
     "price": 280000,
@@ -737,6 +763,7 @@
     "type": "TOOL",
     "name": { "str": "UPS (off)", "str_pl": "UPSes (off)" },
     "description": "A unified power supply, or UPS.  It is a device developed jointly by military and scientific interests for use in combat and the field.  The UPS is designed to power bionics, armor, and some guns, but drains batteries quickly.  Use it to turn it on.",
+    "//": "Intended as an inverter that attaches to a battery, therefore it's volume will expand based on the size of battery attached.",
     "weight": "680 g",
     "volume": "2500 ml",
     "price": 280000,

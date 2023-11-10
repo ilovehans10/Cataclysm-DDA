@@ -90,6 +90,7 @@
           "robofac_gun_smg",
           "robofac_gun_dmr",
           "robofac_gun_shotgun",
+          "robofac_gun_shotgun_breach",
           "robofac_gun_exodii",
           "robofac_gun_57",
           "robofac_gun_46"
@@ -191,6 +192,7 @@
           "robofac_gun_smg",
           "robofac_gun_dmr",
           "robofac_gun_shotgun",
+          "robofac_gun_shotgun_breach",
           "robofac_gun_exodii",
           "robofac_gun_57",
           "robofac_gun_46"
@@ -489,7 +491,8 @@
         "max_contains_weight": "1500 g",
         "max_item_length": "70 cm",
         "moves": 50,
-        "flag_restriction": [ "BELT_CLIP", "SHEATH_KNIFE" ]
+        "flag_restriction": [ "BELT_CLIP", "SHEATH_KNIFE" ],
+        "transparent": true
       },
       {
         "holster": true,
@@ -499,7 +502,8 @@
         "max_contains_weight": "1500 g",
         "max_item_length": "70 cm",
         "moves": 50,
-        "flag_restriction": [ "BELT_CLIP", "SHEATH_KNIFE" ]
+        "flag_restriction": [ "BELT_CLIP", "SHEATH_KNIFE" ],
+        "transparent": true
       }
     ],
     "flags": [ "WATER_FRIENDLY", "BELTED" ],
@@ -598,7 +602,7 @@
     "material_thickness": 5.25,
     "environmental_protection": 5,
     "warmth": 20,
-    "flags": [ "BLOCK_WHILE_WORN", "OUTER" ],
+    "flags": [ "BLOCK_WHILE_WORN", "OUTER", "PADDED" ],
     "armor": [
       {
         "encumbrance": 3,
@@ -625,7 +629,7 @@
     "material_thickness": 5.25,
     "environmental_protection": 5,
     "warmth": 20,
-    "flags": [ "OUTER" ],
+    "flags": [ "OUTER", "PADDED" ],
     "armor": [
       {
         "encumbrance": 3,

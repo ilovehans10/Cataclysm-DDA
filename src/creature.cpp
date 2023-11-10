@@ -124,7 +124,7 @@ static const mon_flag_str_id mon_flag_WATER_CAMOUFLAGE( "WATER_CAMOUFLAGE" );
 
 static const species_id species_ROBOT( "ROBOT" );
 
-static const trait_id trait_GLASSJAW( "GLASSJAW" );
+static const trait_id trait_DEBUG_CLOAK( "DEBUG_CLOAK" );
 static const trait_id trait_PYROMANIA( "PYROMANIA" );
 
 const std::map<std::string, creature_size> Creature::size_map = {
@@ -295,6 +295,12 @@ bool Creature::is_likely_underwater() const
            ( has_flag( mon_flag_AQUATIC ) && get_map().has_flag( ter_furn_flag::TFLAG_SWIMMABLE, pos() ) );
 }
 
+// Detects whether a target is sapient or not (or barely sapient, since ferals count)
+bool Creature::has_mind() const
+{
+    return false;
+}
+
 bool Creature::is_ranged_attacker() const
 {
     if( has_flag( mon_flag_RANGED_ATTACKER ) ) {
@@ -420,8 +426,9 @@ bool Creature::sees( const Creature &critter ) const
         return false;
     }
     if( ch != nullptr ) {
-        if( ch->is_crouching() || ch->is_prone() ) {
-            const int coverage = here.obstacle_coverage( pos(), critter.pos() );
+        if( ch->is_crouching() || ch->is_prone() || pos().z != critter.pos().z ) {
+            const int coverage = std::max( here.obstacle_coverage( pos(), critter.pos() ),
+                                           here.ledge_coverage( *this, critter.pos() ) );
             if( coverage < 30 ) {
                 return sees( critter.pos(), critter.is_avatar() ) && visible( ch );
             }
@@ -446,15 +453,15 @@ bool Creature::sees( const Creature &critter ) const
                     break;
             }
 
-            int vision_modifier {0};
-
+            int profile = 120 / size_modifier;
             if( ch->is_crouching() ) {
-                vision_modifier = 30 - 0.5 * coverage * size_modifier;
+                profile *= 0.5;
             } else if( ch->is_prone() ) {
-                vision_modifier = 30 - 0.9 * coverage * size_modifier;
+                profile *= 0.275;
             }
 
-            if( vision_modifier > 1 ) {
+            if( coverage < profile ) {
+                const int vision_modifier = std::max( 30 * ( 1 - coverage / profile ), 1 );
                 return sees( critter.pos(), critter.is_avatar(), vision_modifier ) && visible( ch );
             }
             return false;
@@ -964,7 +971,7 @@ projectile_attack_results Creature::select_body_part_projectile_attack(
     const projectile &proj, const double goodhit, const double missed_by ) const
 {
     projectile_attack_results ret( proj );
-    const bool magic = proj.proj_effects.count( "magic" ) > 0;
+    const bool magic = proj.proj_effects.count( "MAGIC" ) > 0;
     double hit_value = missed_by + rng_float( -0.5, 0.5 );
     if( magic ) {
         // Best possible hit
@@ -1090,7 +1097,7 @@ void Creature::messaging_projectile_attack( const Creature *source,
 void Creature::deal_projectile_attack( Creature *source, dealt_projectile_attack &attack,
                                        bool print_messages, const weakpoint_attack &wp_attack )
 {
-    const bool magic = attack.proj.proj_effects.count( "magic" ) > 0;
+    const bool magic = attack.proj.proj_effects.count( "MAGIC" ) > 0;
     const double missed_by = attack.missed_by;
     if( missed_by >= 1.0 && !magic ) {
         // Total miss
@@ -1128,13 +1135,14 @@ void Creature::deal_projectile_attack( Creature *source, dealt_projectile_attack
             add_msg_player_or_npc(
                 m_warning,
                 _( "You avoid %s projectile!" ),
-                _( "<npcname> avoids %s projectile." ),
+                get_option<bool>( "LOG_MONSTER_ATTACK_MONSTER" ) ? _( "<npcname> avoids %s projectile." ) : "",
                 source->disp_name( true ) );
         } else {
             add_msg_player_or_npc(
                 m_warning,
                 _( "You avoid an incoming projectile!" ),
-                _( "<npcname> avoids an incoming projectile." ) );
+                get_option<bool>( "LOG_MONSTER_ATTACK_MONSTER" ) ? _( "<npcname> avoids an incoming projectile." ) :
+                "" );
         }
         return;
     }
@@ -1354,6 +1362,10 @@ void Creature::longpull( const std::string &name, const tripoint &p )
 
 bool Creature::stumble_invis( const Creature &player, const bool stumblemsg )
 {
+    // DEBUG insivibility can't be seen through
+    if( player.has_trait( trait_DEBUG_CLOAK ) ) {
+        return false;
+    }
     if( !fov_3d && posz() != player.posz() ) {
         return false;
     }
@@ -1605,7 +1617,7 @@ void Creature::add_effect( const effect_source &source, const efftype_id &eff_id
         }
         ( *effects )[eff_id][bp] = e;
         if( Character *ch = as_character() ) {
-            get_event_bus().send<event_type::character_gains_effect>( ch->getID(), eff_id );
+            get_event_bus().send<event_type::character_gains_effect>( ch->getID(), bp.id(), eff_id );
             if( is_avatar() ) {
                 eff_id->add_apply_msg( e.get_intensity() );
             }
@@ -2108,29 +2120,6 @@ void Creature::set_body()
     }
 }
 
-void Creature::calc_all_parts_hp( float hp_mod, float hp_adjustment, int str_max, int dex_max,
-                                  int per_max,  int int_max, int healthy_mod,  int fat_to_max_hp )
-{
-    for( std::pair<const bodypart_str_id, bodypart> &part : body ) {
-        int new_max = ( part.first->base_hp + str_max * part.first->hp_mods.str_mod + dex_max *
-                        part.first->hp_mods.dex_mod + int_max * part.first->hp_mods.int_mod + per_max *
-                        part.first->hp_mods.per_mod + part.first->hp_mods.health_mod * healthy_mod + fat_to_max_hp +
-                        hp_adjustment ) * hp_mod;
-
-        if( has_trait( trait_GLASSJAW ) && part.first == body_part_head ) {
-            new_max *= 0.8;
-        }
-
-        float max_hp_ratio = static_cast<float>( new_max ) /
-                             static_cast<float>( part.second.get_hp_max() );
-
-        int new_cur = std::ceil( static_cast<float>( part.second.get_hp_cur() ) * max_hp_ratio );
-
-        part.second.set_hp_max( std::max( new_max, 1 ) );
-        part.second.set_hp_cur( std::max( std::min( new_cur, new_max ), 0 ) );
-    }
-}
-
 bool Creature::has_part( const bodypart_id &id, body_part_filter filter ) const
 {
     return get_part_id( id, filter, true ) != body_part_bp_null;
@@ -2268,12 +2257,12 @@ int Creature::get_part_wetness( const bodypart_id &id ) const
     return get_part_helper( *this, id, &bodypart::get_wetness );
 }
 
-int Creature::get_part_temp_cur( const bodypart_id &id ) const
+units::temperature Creature::get_part_temp_cur( const bodypart_id &id ) const
 {
     return get_part_helper( *this, id, &bodypart::get_temp_cur );
 }
 
-int Creature::get_part_temp_conv( const bodypart_id &id ) const
+units::temperature Creature::get_part_temp_conv( const bodypart_id &id ) const
 {
     return get_part_helper( *this, id, &bodypart::get_temp_conv );
 }
@@ -2332,12 +2321,12 @@ void Creature::set_part_wetness( const bodypart_id &id, int set )
     set_part_helper( *this, id, &bodypart::set_wetness, set );
 }
 
-void Creature::set_part_temp_cur( const bodypart_id &id, int set )
+void Creature::set_part_temp_cur( const bodypart_id &id, units::temperature set )
 {
     set_part_helper( *this, id, &bodypart::set_temp_cur, set );
 }
 
-void Creature::set_part_temp_conv( const bodypart_id &id, int set )
+void Creature::set_part_temp_conv( const bodypart_id &id, units::temperature set )
 {
     set_part_helper( *this, id, &bodypart::set_temp_conv, set );
 }
@@ -2386,12 +2375,12 @@ void Creature::mod_part_wetness( const bodypart_id &id, int mod )
     set_part_helper( *this, id, &bodypart::mod_wetness, mod );
 }
 
-void Creature::mod_part_temp_cur( const bodypart_id &id, int mod )
+void Creature::mod_part_temp_cur( const bodypart_id &id, units::temperature_delta mod )
 {
     set_part_helper( *this, id, &bodypart::mod_temp_cur, mod );
 }
 
-void Creature::mod_part_temp_conv( const bodypart_id &id, int mod )
+void Creature::mod_part_temp_conv( const bodypart_id &id, units::temperature_delta mod )
 {
     set_part_helper( *this, id, &bodypart::mod_temp_conv, mod );
 }
@@ -2401,7 +2390,7 @@ void Creature::mod_part_frostbite_timer( const bodypart_id &id, int mod )
     set_part_helper( *this, id, &bodypart::mod_frostbite_timer, mod );
 }
 
-void Creature::set_all_parts_temp_cur( int set )
+void Creature::set_all_parts_temp_cur( units::temperature set )
 {
     for( std::pair<const bodypart_str_id, bodypart> &elem : body ) {
         if( elem.first->has_flag( json_flag_IGNORE_TEMP ) ) {
@@ -2411,7 +2400,7 @@ void Creature::set_all_parts_temp_cur( int set )
     }
 }
 
-void Creature::set_all_parts_temp_conv( int set )
+void Creature::set_all_parts_temp_conv( units::temperature set )
 {
     for( std::pair<const bodypart_str_id, bodypart> &elem : body ) {
         if( elem.first->has_flag( json_flag_IGNORE_TEMP ) ) {

@@ -30,6 +30,7 @@
 #include "input.h"
 #include "inventory.h"
 #include "item.h"
+#include "iteminfo_query.h"
 #include "item_group.h"
 #include "item_stack.h"
 #include "iuse.h"
@@ -89,6 +90,7 @@ static const itype_id itype_nail( "nail" );
 static const itype_id itype_sheet( "sheet" );
 static const itype_id itype_stick( "stick" );
 static const itype_id itype_string_36( "string_36" );
+static const itype_id itype_wall_wiring( "wall_wiring" );
 
 static const mon_flag_str_id mon_flag_HUMAN( "HUMAN" );
 
@@ -337,6 +339,23 @@ const std::vector<construction> &get_constructions()
     return constructions;
 }
 
+static std::string furniture_qualities_string( const furn_id &fid )
+{
+    std::string ret = "\n";
+    // Make a pseudo item instance so we can use qualities_info later
+    const item pseudo( fid->crafting_pseudo_item );
+    // Set up iteminfo query to show qualities
+    std::vector<iteminfo_parts> quality_part = { iteminfo_parts::QUALITIES };
+    const iteminfo_query quality_query( quality_part );
+    // Render info into info_vec
+    std::vector<iteminfo> info_vec;
+    pseudo.qualities_info( info_vec, &quality_query, 1, false );
+    // Get a newline-separated string of quality info, then parse and print each line
+    ret += format_item_info( info_vec, {} );
+
+    return ret;
+}
+
 construction_id construction_menu( const bool blueprint )
 {
     if( !finalized ) {
@@ -473,6 +492,10 @@ construction_id construction_menu( const bool blueprint )
                                             furn_str_id( current_con->post_terrain ).obj().description,
                                             color_data
                                         );
+                        furn_id fid( current_con->post_terrain );
+                        if( !fid->crafting_pseudo_item.is_empty() ) {
+                            current_line += furniture_qualities_string( fid );
+                        }
                     } else {
                         current_line += colorize(
                                             ter_str_id( current_con->post_terrain ).obj().description,
@@ -489,6 +512,10 @@ construction_id construction_menu( const bool blueprint )
                                             furn_str_id( current_con->post_terrain ).obj().description,
                                             color_data
                                         );
+                        furn_id fid( current_con->post_terrain );
+                        if( !fid->crafting_pseudo_item.is_empty() ) {
+                            current_line += furniture_qualities_string( fid );
+                        }
                     } else {
                         current_line += colorize(
                                             ter_str_id( current_con->post_terrain ).obj().description,
@@ -1009,6 +1036,8 @@ void place_construction( std::vector<construction_group_str_id> const &groups )
     for( const auto &it : con.requirements->get_tools() ) {
         player_character.consume_tools( it );
     }
+    player_character.invalidate_crafting_inventory();
+    player_character.invalidate_weight_carried_cache();
     player_character.assign_activity( ACT_BUILD );
     player_character.activity.placement = here.getglobal( pnt );
 }
@@ -1043,10 +1072,10 @@ void complete_construction( Character *you )
     };
 
     award_xp( *you );
-    // Friendly NPCs gain exp from assisting or watching...
-    // TODO: NPCs watching other NPCs do stuff and learning from it
+    // Other friendly Characters gain exp from assisting or watching...
+    // TODO: Characters watching other Characters do stuff and learning from it
     if( you->is_avatar() ) {
-        for( npc *&elem : get_avatar().get_crafting_helpers() ) {
+        for( Character *elem : get_avatar().get_crafting_helpers() ) {
             if( elem->meets_skill_requirements( built ) ) {
                 add_msg( m_info, _( "%s assists you with the work…" ), elem->get_name() );
             } else {
@@ -1119,7 +1148,7 @@ void complete_construction( Character *you )
     // This comes after clearing the activity, in case the function interrupts
     // activities
     built.post_special( terp, *you );
-    // npcs will automatically resume backlog, players wont.
+    // Players will not automatically resume backlog, other Characters will.
     if( you->is_avatar() && !you->backlog.empty() &&
         you->backlog.front().id() == ACT_MULTIPLE_CONSTRUCTION ) {
         you->backlog.clear();
@@ -1395,7 +1424,8 @@ void construct::done_vehicle( const tripoint_bub_ms &p, Character & )
     const item &base = components.front();
 
     veh->name = name;
-    veh->install_part( point_zero, vpart_from_item( base.typeId() ), item( base ) );
+    const int partnum = veh->install_part( point_zero, vpart_from_item( base.typeId() ), item( base ) );
+    veh->part( partnum ).set_flag( vp_flag::unsalvageable_flag );
 
     // Update the vehicle cache immediately,
     // or the vehicle will be invisible for the first couple of turns.
@@ -1406,7 +1436,7 @@ void construct::done_wiring( const tripoint_bub_ms &p, Character &/*who*/ )
 {
     get_map().partial_con_remove( p );
 
-    place_appliance( p.raw(), vpart_from_item( STATIC( itype_id( "wall_wiring" ) ) ) );
+    place_appliance( p.raw(), vpart_from_item( itype_wall_wiring ) );
 }
 
 void construct::done_appliance( const tripoint_bub_ms &p, Character & )
@@ -2027,7 +2057,7 @@ int construction::adjusted_time() const
     int final_time = time;
     int assistants = 0;
 
-    for( npc *&elem : get_avatar().get_crafting_helpers() ) {
+    for( Character *elem : get_avatar().get_crafting_helpers() ) {
         if( elem->meets_skill_requirements( *this ) ) {
             assistants++;
         }

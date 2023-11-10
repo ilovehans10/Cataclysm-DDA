@@ -13,6 +13,18 @@
   },
   {
     "type": "keybinding",
+    "id": "UILIST.LEFT",
+    "name": "Pan left",
+    "bindings": [ { "input_method": "keyboard_any", "key": "LEFT" } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "UILIST.RIGHT",
+    "name": "Pan right",
+    "bindings": [ { "input_method": "keyboard_any", "key": "RIGHT" } ]
+  },
+  {
+    "type": "keybinding",
     "id": "UILIST.FILTER",
     "name": "Filter",
     "bindings": [ { "input_method": "keyboard_any", "key": "/" }, { "input_method": "keyboard_code", "key": "KEYPAD_DIVIDE" } ]
@@ -290,6 +302,17 @@
     "category": "SPELL_MENU",
     "name": "Scroll down spell info",
     "bindings": [ { "input_method": "keyboard_char", "key": ">" }, { "input_method": "keyboard_code", "key": ".", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "SCROLL_FAVORITE",
+    "category": "SPELL_MENU",
+    "name": "Toggle spell as favorite",
+    "bindings": [
+      { "input_method": "keyboard_char", "key": "*" },
+      { "input_method": "keyboard_code", "key": "KEYPAD_MULTIPLY" },
+      { "input_method": "keyboard_code", "key": "8", "mod": [ "shift" ] }
+    ]
   },
   {
     "type": "keybinding",
@@ -755,6 +778,13 @@
       { "input_method": "keyboard_code", "key": "KEYPAD_MULTIPLY" },
       { "input_method": "keyboard_code", "key": "8", "mod": [ "shift" ] }
     ]
+  },
+  {
+    "type": "keybinding",
+    "id": "COMPARE",
+    "category": "CRAFTING",
+    "name": "Compare recipe to item in inventory",
+    "bindings": [ { "input_method": "keyboard_char", "key": "I" }, { "input_method": "keyboard_code", "key": "i", "mod": [ "shift" ] } ]
   },
   {
     "type": "keybinding",
@@ -1528,6 +1558,27 @@
   },
   {
     "type": "keybinding",
+    "id": "CHANGE_START_OF_CATACLYSM",
+    "category": "NEW_CHAR_DESCRIPTION",
+    "name": "Change cataclysm start date",
+    "bindings": [ { "input_method": "keyboard_char", "key": "%" }, { "input_method": "keyboard_code", "key": "5", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "CHANGE_START_OF_GAME",
+    "category": "NEW_CHAR_DESCRIPTION",
+    "name": "Change game start date",
+    "bindings": [ { "input_method": "keyboard_char", "key": "^" }, { "input_method": "keyboard_code", "key": "6", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "RESET_CALENDAR",
+    "category": "NEW_CHAR_DESCRIPTION",
+    "name": "Reset scenario calendar",
+    "bindings": [ { "input_method": "keyboard_char", "key": "$" }, { "input_method": "keyboard_code", "key": "4", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
     "id": "CHOOSE_CITY",
     "category": "NEW_CHAR_DESCRIPTION",
     "name": "Choose character starting city",
@@ -1583,6 +1634,27 @@
     "category": "NEW_CHAR_SCENARIOS",
     "name": "Toggle sorting order",
     "bindings": [ { "input_method": "keyboard_any", "key": "s" } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "CHANGE_START_OF_CATACLYSM",
+    "category": "NEW_CHAR_SCENARIOS",
+    "name": "Change cataclysm start date",
+    "bindings": [ { "input_method": "keyboard_char", "key": "%" }, { "input_method": "keyboard_code", "key": "5", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "CHANGE_START_OF_GAME",
+    "category": "NEW_CHAR_SCENARIOS",
+    "name": "Change game start date",
+    "bindings": [ { "input_method": "keyboard_char", "key": "^" }, { "input_method": "keyboard_code", "key": "6", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "RESET_CALENDAR",
+    "category": "NEW_CHAR_SCENARIOS",
+    "name": "Reset scenario calendar",
+    "bindings": [ { "input_method": "keyboard_char", "key": "$" }, { "input_method": "keyboard_code", "key": "4", "mod": [ "shift" ] } ]
   },
   {
     "type": "keybinding",
@@ -1658,6 +1730,20 @@
     "category": "APP_INTERACT",
     "name": "Plug in appliance",
     "bindings": [ { "input_method": "keyboard_any", "key": "g" } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "UNPLUG",
+    "category": "APP_INTERACT",
+    "name": "Unplug power connections",
+    "bindings": [ { "input_method": "keyboard_any", "key": "u" } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "MERGE",
+    "category": "APP_INTERACT",
+    "name": "Merge power grids",
+    "bindings": [ { "input_method": "keyboard_any", "key": "m" } ]
   },
   {
     "type": "keybinding",
@@ -2047,6 +2133,13 @@
   },
   {
     "type": "keybinding",
+    "id": "CONTAIN_MODE",
+    "category": "INVENTORY",
+    "name": "Toggle contain mode for unloaded items",
+    "bindings": [ { "input_method": "keyboard_char", "key": "U" }, { "input_method": "keyboard_code", "key": "u", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
     "id": "TOGGLE_EXAMINE",
     "category": "BIONICS",
     "name": "Toggle activate/examine",
@@ -2419,6 +2512,13 @@
   },
   {
     "type": "keybinding",
+    "name": "Insert item",
+    "category": "DEFAULTMODE",
+    "id": "insert",
+    "bindings": [ { "input_method": "keyboard_any", "key": "v" } ]
+  },
+  {
+    "type": "keybinding",
     "name": "Unload item",
     "category": "DEFAULTMODE",
     "id": "unload",
@@ -2697,6 +2797,17 @@
   },
   {
     "type": "keybinding",
+    "id": "RESET",
+    "category": "CALENDAR_UI",
+    "name": "Reset time point to initial value",
+    "bindings": [
+      { "input_method": "keyboard_any", "key": "r" },
+      { "input_method": "keyboard_char", "key": "R" },
+      { "input_method": "keyboard_code", "key": "r", "mod": [ "shift" ] }
+    ]
+  },
+  {
+    "type": "keybinding",
     "name": "View scent map",
     "category": "DEFAULTMODE",
     "id": "debug_scent"
@@ -2709,7 +2820,7 @@
   },
   {
     "type": "keybinding",
-    "name": "View temperature map",
+    "name": "View temperature map (using Map font)",
     "category": "DEFAULTMODE",
     "id": "debug_temp"
   },
@@ -3943,7 +4054,7 @@
     "type": "keybinding",
     "id": "QUIT",
     "category": "YESNOQUIT",
-    "name": "Quit",
+    "name": "Cancel",
     "bindings": [
       { "input_method": "keyboard_char", "key": "Q" },
       { "input_method": "keyboard_code", "key": "q", "mod": [ "shift" ] },
@@ -4271,6 +4382,55 @@
   },
   {
     "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_STATS_TAB",
+    "name": "Select stats tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F1" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_ENCUMBRANCE_TAB",
+    "name": "Select encumbrance tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F2" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_SKILLS_TAB",
+    "name": "Select skills tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F3" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_TRAITS_TAB",
+    "name": "Select traits tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F4" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_BIONICS_TAB",
+    "name": "Select bionics tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F5" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_EFFECTS_TAB",
+    "name": "Select effects tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F6" } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "PLAYER_INFO",
+    "id": "SELECT_PROFICIENCIES_TAB",
+    "name": "Select proficiencies tab",
+    "bindings": [ { "input_method": "keyboard_any", "key": "F7" } ]
+  },
+  {
+    "type": "keybinding",
     "category": "WISH_ITEM",
     "id": "CONTAINER",
     "name": "Toggle spawning item with container",
@@ -4296,6 +4456,34 @@
     "id": "SNIPPET",
     "name": "Choose snippet",
     "bindings": [ { "input_method": "keyboard_char", "key": "S" }, { "input_method": "keyboard_code", "key": "s", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "WISH_ITEM",
+    "id": "SCROLL_DESC_UP",
+    "name": "Scroll item description up",
+    "bindings": [ { "input_method": "keyboard_char", "key": "<" }, { "input_method": "keyboard_code", "key": ",", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "category": "WISH_ITEM",
+    "id": "SCROLL_DESC_DOWN",
+    "name": "Scroll item description Down",
+    "bindings": [ { "input_method": "keyboard_char", "key": ">" }, { "input_method": "keyboard_code", "key": ".", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "SCROLL_ITEM_INFO_UP",
+    "category": "VENDING_MACHINE",
+    "name": "Scroll item info up",
+    "bindings": [ { "input_method": "keyboard_char", "key": "<" }, { "input_method": "keyboard_code", "key": ",", "mod": [ "shift" ] } ]
+  },
+  {
+    "type": "keybinding",
+    "id": "SCROLL_ITEM_INFO_DOWN",
+    "category": "VENDING_MACHINE",
+    "name": "Scroll item info down",
+    "bindings": [ { "input_method": "keyboard_char", "key": ">" }, { "input_method": "keyboard_code", "key": ".", "mod": [ "shift" ] } ]
   },
   {
     "type": "keybinding",
